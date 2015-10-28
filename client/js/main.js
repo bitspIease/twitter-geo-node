@@ -5,7 +5,7 @@ var socket = io();
 
 // Listen for tweets from the server.
 socket.on('tweets', function(data) {
-	alert(JSON.stringify(data));
+	console.log(JSON.stringify(data));
 
 	// TODO: do something with the tweet.
 });
