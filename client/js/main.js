@@ -3,13 +3,23 @@
 // Connect to the server via socket.js.
 var socket = io();
 
+// Listen for tweets from the server.
+socket.on('tweets', function(data) {
+	alert(JSON.stringify(data));
 
-//Geolocation Functions
-function showPosition(position) {
-    document.write('Latitude: '+position.coords.latitude+'Longitude: '+position.coords.longitude);
+	// TODO: do something with the tweet.
+});
+
+// Callback for successful geolocation.
+function geolocationSuccesful(position) {
+	socket.emit('location', {
+		latitude: position.coords.latitude,
+		longitude: position.coords.longitude
+	});
 }
 
-function showError(error) {
+// Callback for error in geolocation.
+function geolocationError(error) {
 	switch(error.code) {
 		case error.PERMISSION_DENIED:
 			alert("User denied the request for Geolocation.");
@@ -26,16 +36,16 @@ function showError(error) {
 	}
 }
 
+// Attempt to acquire geolocation data.
 if (navigator.geolocation) {
     var optn = {
-			enableHighAccuracy : true,
-			timeout : Infinity,
-			maximumAge : 0
-		};
+		enableHighAccuracy : true,
+		timeout : Infinity,
+		maximumAge : 0
+	};
+
 	// Get the user's current position
-    navigator.geolocation.getCurrentPosition(showPosition, showError, optn);
-} 
-else {
-	alert('Geolocation is not supported in your browser');
+    navigator.geolocation.getCurrentPosition(geolocationSuccesful, geolocationError, optn);
+} else {
+	alert('Geolocation is not supported in your browser.');
 }
-//End Geolocation Functions
