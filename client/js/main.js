@@ -8,6 +8,13 @@ socket.on('tweets', function(data) {
 	console.log(JSON.stringify(data));
 
 	// TODO: do something with the tweet.
+	//This code is enabled by widgets.js
+	/*twttr.widgets.createTweet(
+		data.id,
+		document.getElementById('tweet_container')
+		);*/
+	document.write(data.id);
+	document.write(data.text); 
 });
 
 // Callback for successful geolocation.

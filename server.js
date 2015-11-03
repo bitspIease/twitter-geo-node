@@ -39,10 +39,11 @@ io.on('connection', function(client) {
 
     // Set up a new stream to feed to the client.
     // TODO: use location
-    var stream = T.stream('statuses/filter', { track: 'bits' })
+    var stream = T.stream('statuses/filter', { track: 'di5c' })
 
     stream.on('tweet', function (tweet) {
       client.emit('tweets', tweet);
+      console.log('tweet recieved');
     });
   });
 });
