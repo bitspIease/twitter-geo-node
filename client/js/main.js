@@ -4,10 +4,13 @@
 var socket = io();
 
 // Listen for tweets from the server.
-socket.on('tweets', function(data) {
-	console.log(JSON.stringify(data));
+socket.on('tweets', function(tweet) {
+	var tweetID = tweet.id_str;
+	console.log("received tweet with id: " + tweetID);
 
-	// TODO: do something with the tweet.
+	// Append a new tweet to the container.
+	$("#tweet-container").append("<div id=" + tweetID + "></div>");
+	twttr.widgets.createTweet(tweetID, $("#" + tweetID)[0], {});
 });
 
 // Callback for successful geolocation.
