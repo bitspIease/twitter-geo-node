@@ -2,12 +2,14 @@
 
 // Set up the Twitter library.
 var Twit = require('twit')
-var T = new Twit({
-  consumer_key: 'Z2LyQpbFs0OzmFRQHPJmmzhoS',
-  consumer_secret: '5T5Ep2yQHjf0XiGDUgSRJC38iliTdJg7teutnu50S4Z4e4nMEm',
-  access_token: '3837516989-IgSf9kbiEa2Df9EhD0Rut7sPh0QVh5cOJHsMk2j',
-  access_token_secret: 'rk40a0TCd7mGcy5HvOqj5gn15VwqgMJpX9S51kgg3iUn3'
-})
+function createTwitClient() {
+  return new Twit({
+    consumer_key: 'Z2LyQpbFs0OzmFRQHPJmmzhoS',
+    consumer_secret: '5T5Ep2yQHjf0XiGDUgSRJC38iliTdJg7teutnu50S4Z4e4nMEm',
+    access_token: '3837516989-IgSf9kbiEa2Df9EhD0Rut7sPh0QVh5cOJHsMk2j',
+    access_token_secret: 'rk40a0TCd7mGcy5HvOqj5gn15VwqgMJpX9S51kgg3iUn3'
+  });
+}
 
 // Set up express for serving the client.
 var express = require('express');
@@ -32,22 +34,42 @@ http.listen(process.env.PORT, function() {
 
 // Listen for connections.
 io.on('connection', function(client) {
-  console.log('connected');
+  console.log("* client " + client.id + " connected");
 
+  var streams = [];
+  var twitter = createTwitClient();
+
+  // Listen for disconnects.
+  client.on('disconnect', function() {
+    console.log("* client " + client.id + " disconnected");
+
+    // Stop all streams.
+    streams.forEach(function (stream) {
+      stream.stop();
+    });
+  });
+
+  // Aggregate function for location and keyword streams.
+  var handleTweet = function(tweet) {
+    console.log("* client" + client.id + " was sent tweet: " + tweet.id);
+
+    // TODO: filter keywords.
+
+    // Send the tweet to the client.
+    client.emit('tweets', tweet);
+  };
+
+  // Listen for location notifications sent from the client.
   client.on('location', function(data) {
-    console.log('got location: lat: ' + data.latitude + ', lon: ' + data.longitude);
+    console.log("* client " + client.id + " sent location: " + JSON.stringify(data));
 
     // Set up a new stream to feed to the client.
     // TODO: use location
-    var stream = T.stream('statuses/filter', { track: 'di5c' })
+    var stream = twitter.stream('statuses/filter', { track: 'mango' });
+    streams.push(stream);
 
     stream.on('tweet', function (tweet) {
-      client.emit('tweets', tweet);
-      console.log('tweet recieved');
+      handleTweet(tweet);
     });
   });
 });
-
-
-
-
