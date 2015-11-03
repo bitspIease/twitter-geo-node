@@ -51,7 +51,7 @@ io.on('connection', function(client) {
 
   // Aggregate function for location and keyword streams.
   var handleTweet = function(tweet) {
-    console.log("* client" + client.id + " was sent tweet: " + tweet.id);
+    console.log("* client " + client.id + " was sent tweet: " + tweet.id);
 
     // TODO: filter keywords.
 
@@ -68,7 +68,7 @@ io.on('connection', function(client) {
     //Example Below: (Dummy values)
     //var CollegeStation = ['123,23,-132,-32'];
     //var stream = twitter.stream('statuses/filter', {locations: CollegeStation});
-    
+
     var stream = twitter.stream('statuses/filter', { track: 'mango' });
     streams.push(stream);
 

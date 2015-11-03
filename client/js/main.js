@@ -4,17 +4,15 @@
 var socket = io();
 
 // Listen for tweets from the server.
-socket.on('tweets', function(data) {
-	console.log(JSON.stringify(data));
+socket.on('tweets', function(tweet) {
+	var tweetID = tweet.id_str;
+	console.log("id: " + tweetID);
 
-	// TODO: do something with the tweet.
-	//This code is enabled by widgets.js
-	/*twttr.widgets.createTweet(
-		data.id,
-		document.getElementById('tweet_container')
-		);*/
-	document.write(data.id);
-	document.write(data.text); 
+	$("#tweet-container").append("<div id=" + tweetID + "></div>");
+
+	console.log(tweetID + " vs. " + '511181794914627584');
+
+	twttr.widgets.createTweet(tweetID, $("#" + tweetID)[0], {});
 });
 
 // Callback for successful geolocation.
