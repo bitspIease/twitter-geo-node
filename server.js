@@ -65,6 +65,10 @@ io.on('connection', function(client) {
 
     // Set up a new stream to feed to the client.
     // TODO: use location
+    //Example Below: (Dummy values)
+    //var CollegeStation = ['123,23,-132,-32'];
+    //var stream = twitter.stream('statuses/filter', {locations: CollegeStation});
+    
     var stream = twitter.stream('statuses/filter', { track: 'mango' });
     streams.push(stream);
 
