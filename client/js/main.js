@@ -6,12 +6,10 @@ var socket = io();
 // Listen for tweets from the server.
 socket.on('tweets', function(tweet) {
 	var tweetID = tweet.id_str;
-	console.log("id: " + tweetID);
+	console.log("received tweet with id: " + tweetID);
 
+	// Append a new tweet to the container.
 	$("#tweet-container").append("<div id=" + tweetID + "></div>");
-
-	console.log(tweetID + " vs. " + '511181794914627584');
-
 	twttr.widgets.createTweet(tweetID, $("#" + tweetID)[0], {});
 });
 
