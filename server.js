@@ -69,7 +69,7 @@ io.on('connection', function(client) {
     //var CollegeStation = ['123,23,-132,-32'];
     //var stream = twitter.stream('statuses/filter', {locations: CollegeStation});
 
-    var stream = twitter.stream('statuses/filter', { track: 'mango' });
+    var stream = twitter.stream('statuses/filter', { track: 'NFL' });
     streams.push(stream);
 
     stream.on('tweet', function (tweet) {
