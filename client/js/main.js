@@ -9,7 +9,7 @@ socket.on('tweets', function(tweet) {
 	console.log("received tweet with id: " + tweetID);
 
 	// Append a new tweet to the container.
-	$("#tweet-container").append("<div id=" + tweetID + "></div>");
+	$("#tweet-container").prepend("<div id=" + tweetID + "></div>");
 	twttr.widgets.createTweet(tweetID, $("#" + tweetID)[0], {});
 });
 
