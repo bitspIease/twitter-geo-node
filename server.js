@@ -54,12 +54,12 @@ io.on('connection', function(client) {
   var handleTweet = function(tweet) {
     console.log("* client " + client.id + " was sent tweet: " + tweet.id);
 
-    //If a keyword filter has not been set just do location
+    // If a keyword filter has not been set just do location
     if(keyword === null ){
       console.log("Keyword not defined");
        client.emit('tweets', tweet);
     }
-    //If it has been set filter location by keyword
+    // If it has been set filter location by keyword
     else{
       var match = tweet.text.search(' ' + keyword + ' ');
 
@@ -73,25 +73,25 @@ io.on('connection', function(client) {
   // Listen for location notifications sent from the client.
   client.on('location', function(data) {
     console.log("* client " + client.id + " sent location: " + JSON.stringify(data));
-    
-    //Set up stream based upon client location
+
+    // Set up stream based upon client location
     var client_location = [data.longitude - 1, data.latitude, data.longitude, data.latitude + 1];
     var stream = twitter.stream('statuses/filter', { locations: client_location});
-    
-    //push to strams array for multiple streams
+
+    // Push to strams array for multiple streams.
     streams.push(stream);
 
-    //What to do with tweets
+    // What to do with tweets
     stream.on('tweet', function (tweet) {
       handleTweet(tweet);
     });
   });
-  
-  //Listen for filter keyword
+
+  // Listen for filter keyword
   client.on('filter', function(data) {
     console.log("* client " + client.id + " sent filter: " + data);
     keyword = data;
   });
-  
-//End IO connection
+
+// End IO connection
 });
