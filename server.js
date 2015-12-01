@@ -53,13 +53,20 @@ io.on('connection', function(client) {
   var handleTweet = function(tweet) {
     console.log("* client " + client.id + " was sent tweet: " + tweet.id);
 
-    // TODO: filter keywords.
-    var match = tweet.text.search(' the ');
-
-    // Send the tweet to the client.
-    if(match != -1){
-      client.emit('tweets', tweet);
+    //If a keyword filter has not been set just do location
+    if(typeof keyword === "undefined" ){
+       client.emit('tweets', tweet);
     }
+    //If it has been set filter location by keyword
+    else{
+      var match = tweet.text.search(' ' + keyword + ' ');
+
+      // Send the tweet to the client.
+      if(match != -1){
+        client.emit('tweets', tweet);
+      }
+    }
+   
   };
 
   // Listen for location notifications sent from the client.
@@ -79,4 +86,12 @@ io.on('connection', function(client) {
       handleTweet(tweet);
     });
   });
+  
+  //Listen for filter keyword
+  client.on('filter', function(data) {
+    console.log("* client " + client.id + " sent filter: " + data);
+    var keyword = data;
+  });
+    
+  
 });
