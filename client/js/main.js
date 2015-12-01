@@ -3,13 +3,26 @@
 // Connect to the server via socket.js.
 var socket = io();
 
+// Configure Sly (for the scrolling items).
+var options = {
+	horizontal: 1,
+	itemNav: 'basic',
+	mouseDragging: 1,
+	releaseSwing: 1,
+	elasticBounds: 1,
+	speed: 300,
+};
+var $frame = new Sly('.frame', options).init();
+
 // Listen for tweets from the server.
 socket.on('tweets', function(tweet) {
 	var tweetID = tweet.id_str;
 	console.log("received tweet with id: " + tweetID);
 
 	// Append a new tweet to the container.
-	$("#tweet-container").prepend("<div id=" + tweetID + "></div>");
+	$frame.add('<div class="item">' + '<div id=' + tweetID + '></div></div>', 0);
+
+	// Replace temporary element with an embedded tweet.
 	twttr.widgets.createTweet(tweetID, $("#" + tweetID)[0], {});
 });
 
@@ -51,4 +64,11 @@ if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(geolocationSuccesful, geolocationError, optn);
 } else {
 	alert('Geolocation is not supported in your browser.');
+}
+
+
+//Sending filter keyword to server for use
+function sendFilter(form) {
+	var filter = form.inputbox.value;
+	socket.emit('filter', filter);
 }

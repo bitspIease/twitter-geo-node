@@ -1,0 +1,35 @@
+html, body {
+	height: 100%;
+	margin: 0;
+}
+
+/* Scrolling container. */
+.frame {
+	height: 100%;
+	overflow: hidden;
+	transform-style: preserve-3d;
+}
+
+/* Slidee inside of frame. */
+.frame ul {
+	list-style: none;
+	height: 100%;
+}
+
+/* Individual item within slidee. */
+.frame ul .item {
+	float: left;
+	width: 300px;
+	height: 100%;
+	display: block;
+
+	padding: 0;
+	margin: 0 5px 0 0;
+}
+
+/* Tweets within items. */
+.frame ul .item div {
+	top: 50%;
+	position: relative;
+	transform: translateY(-50%);
+}

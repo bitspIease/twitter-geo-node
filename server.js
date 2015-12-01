@@ -37,6 +37,7 @@ io.on('connection', function(client) {
   console.log("* client " + client.id + " connected");
 
   var streams = [];
+  var keyword = null;
   var twitter = createTwitClient();
 
   // Listen for disconnects.
@@ -53,12 +54,19 @@ io.on('connection', function(client) {
   var handleTweet = function(tweet) {
     console.log("* client " + client.id + " was sent tweet: " + tweet.id);
 
-    // TODO: filter keywords.
-    var match = tweet.text.search('.');
+    // If a keyword filter has not been set just do location
+    if(keyword === null ){
+      console.log("Keyword not defined");
+       client.emit('tweets', tweet);
+    }
+    // If it has been set filter location by keyword
+    else{
+      var match = tweet.text.search(' ' + keyword + ' ');
 
-    // Send the tweet to the client.
-    if(match != -1){
-      client.emit('tweets', tweet);
+      // Send the tweet to the client.
+      if(match != -1){
+        client.emit('tweets', tweet);
+      }
     }
   };
 
@@ -68,15 +76,26 @@ io.on('connection', function(client) {
     // Set up a new stream to feed to the client.
     // TODO: use location
     //Example Below: (Dummy values)
+
+    // Set up stream based upon client location
     var client_location = [data.longitude - 1, data.latitude, data.longitude, data.latitude + 1];
-    //var stream = twitter.stream('statuses/filter', {locations: sanFrancisco});
-    
     var stream = twitter.stream('statuses/filter', { locations: client_location});
     //var stream = twitter.stream('statuses/filter', { track: 'mango'});
+
+    // Push to strams array for multiple streams.
     streams.push(stream);
 
+    // What to do with tweets
     stream.on('tweet', function (tweet) {
       handleTweet(tweet);
     });
   });
+
+  // Listen for filter keyword
+  client.on('filter', function(data) {
+    console.log("* client " + client.id + " sent filter: " + data);
+    keyword = data;
+  });
+
+// End IO connection
 });
