@@ -54,9 +54,12 @@ io.on('connection', function(client) {
     console.log("* client " + client.id + " was sent tweet: " + tweet.id);
 
     // TODO: filter keywords.
+    var match = tweet.text.search(' the ');
 
     // Send the tweet to the client.
-    client.emit('tweets', tweet);
+    if(match != -1){
+      client.emit('tweets', tweet);
+    }
   };
 
   // Listen for location notifications sent from the client.
@@ -66,10 +69,10 @@ io.on('connection', function(client) {
     // Set up a new stream to feed to the client.
     // TODO: use location
     //Example Below: (Dummy values)
-    //var CollegeStation = ['123,23,-132,-32'];
-    //var stream = twitter.stream('statuses/filter', {locations: CollegeStation});
+    var SanFrancisco = ['-122.75', '36.8', '-121.75', '37.8'];
+    var stream = twitter.stream('statuses/filter', {locations: SanFrancisco});
 
-    var stream = twitter.stream('statuses/filter', { track: 'mango' });
+    //var stream = twitter.stream('statuses/filter', { track: 'mango' });
     streams.push(stream);
 
     stream.on('tweet', function (tweet) {
