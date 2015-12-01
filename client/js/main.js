@@ -65,3 +65,10 @@ if (navigator.geolocation) {
 } else {
 	alert('Geolocation is not supported in your browser.');
 }
+
+
+//Sending filter keyword to server for use
+function sendFilter(form) {
+	var filter = form.inputbox.value;
+	socket.emit('filter', filter);
+}

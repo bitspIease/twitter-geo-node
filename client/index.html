@@ -7,6 +7,15 @@
     <link rel="stylesheet" href="/css/main.css">
   </head>
   <body>
+    <form action = "main.js" method="get">
+      Filter Keyword: <br>
+      <input type="text" name="inputbox" value="">
+      <br>
+      <input type="button" name="button" value="Filter Location"
+      onClick="sendFilter(this.form)">
+    </form>
+
+    <div id="tweet-container"></div>
     <div class="frame">
       <ul class="slidee">
       </ul>
