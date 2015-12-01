@@ -37,6 +37,7 @@ io.on('connection', function(client) {
   console.log("* client " + client.id + " connected");
 
   var streams = [];
+  var keyword = null;
   var twitter = createTwitClient();
 
   // Listen for disconnects.
@@ -54,7 +55,7 @@ io.on('connection', function(client) {
     console.log("* client " + client.id + " was sent tweet: " + tweet.id);
 
     //If a keyword filter has not been set just do location
-    if(typeof keyword === "undefined" ){
+    if(keyword === null ){
       console.log("Keyword not defined");
        client.emit('tweets', tweet);
     }
@@ -89,7 +90,7 @@ io.on('connection', function(client) {
   //Listen for filter keyword
   client.on('filter', function(data) {
     console.log("* client " + client.id + " sent filter: " + data);
-    var keyword = data;
+    keyword = data;
   });
   
 //End IO connection
