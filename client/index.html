@@ -10,9 +10,10 @@
     <form action = "main.js" method="get">
       Filter Keyword: <br>
       <input type="text" name="inputbox" value="">
+      <input type="checkbox" name="streamtypebox" value="CheckBox1"> Filter by Keyword Only 
       <br>
-      <input type="button" name="button" value="Filter Location"
-      onClick="sendFilter(this.form)">
+      <input type="button" name="button" value="Set Filter" onClick="sendFilter(this.form)">
+      <input type="button" name="startButton" value="Start Stream" onClick="sendStart(this.form)">
     </form>
 
     <div id="tweet-container"></div>
