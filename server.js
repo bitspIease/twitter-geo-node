@@ -54,9 +54,15 @@ io.on('connection', function(client) {
 
   // Aggregate function for location and keyword streams.
   var handleTweet = function(tweet) {
+    // Ignore retweets.
+    if (tweet.hasOwnProperty('retweeted_status')) {
+      if (tweet.retweeted_status.retweet_count > 0) {
+        console.log("* client " + client.id + " ignoring retweet");
+        return;
+      }
+    }
+
     console.log("* client " + client.id + " was sent tweet: " + tweet.id);
-    console.log(tweet.retweeted);
-    console.log(tweet.retweet_count);
 
     // If a keyword filter has not been set just do location
     if(keyword === null ){
@@ -68,17 +74,17 @@ io.on('connection', function(client) {
       var match = tweet.text.search(' ' + keyword + ' ');
 
       // Send the tweet to the client.
-      if(match != -1 || streamType == "KeywordBased"){
+      if(match != -1 || streamType == "Keyword Based"){
         client.emit('tweets', tweet);
       }
     }
   };
-  
+
   //Listen for start stream button
   client.on('start', function(data){
     //Set up stream
     streamType = data;
-    
+
     //Checking what type of stream to set up
     //Location Stream
     if(streamType == "Location Based"){
@@ -96,18 +102,18 @@ io.on('connection', function(client) {
     //Keyword Stream
     else{
         console.log("Starting Keyword Stream");
-        
+
         var stream = twitter.stream('statuses/filter', { track: keyword});
-  
+
         // Push to streams array for multiple streams.
         streams.push(stream);
-  
+
         // What to do with tweets
         stream.on('tweet', function (tweet) {
           handleTweet(tweet);
         });
     }
-    
+
   });
 
   // Listen for location notifications sent from the client.
@@ -116,7 +122,7 @@ io.on('connection', function(client) {
 
     // Set up stream based upon client location
     client_location = [data.longitude - 1, data.latitude, data.longitude, data.latitude + 1];
-    
+
   });
 
   // Listen for filter keyword
