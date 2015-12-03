@@ -54,19 +54,24 @@ io.on('connection', function(client) {
   var handleTweet = function(tweet) {
     console.log("* client " + client.id + " was sent tweet: " + tweet.id);
 
-    // If a keyword filter has not been set just do location
-    if(keyword === null ){
-      console.log("Keyword not defined");
-       client.emit('tweets', tweet);
-    }
-    // If it has been set filter location by keyword
-    else{
-      var match = tweet.text.search(' ' + keyword + ' ');
-
-      // Send the tweet to the client.
-      if(match != -1){
-        client.emit('tweets', tweet);
+    if(tweet.place.country_code != 'MX'){
+        // If a keyword filter has not been set just do location
+        if(keyword === null ){
+        console.log("Keyword not defined");
+         client.emit('tweets', tweet);
       }
+      // If it has been set filter location by keyword
+      else{
+        var match = tweet.text.search(' ' + keyword + ' ');
+  
+        // Send the tweet to the client.
+        if(match != -1){
+          client.emit('tweets', tweet);
+        }
+      }
+    }
+    else{
+      console.log("Mexican Tweet!");
     }
   };
 
@@ -74,13 +79,10 @@ io.on('connection', function(client) {
   client.on('location', function(data) {
     console.log("* client " + client.id + " sent location: " + JSON.stringify(data));
     // Set up a new stream to feed to the client.
-    // TODO: use location
-    //Example Below: (Dummy values)
 
     // Set up stream based upon client location
-    var client_location = [data.longitude - 1, data.latitude, data.longitude, data.latitude + 1];
+    var client_location = [data.longitude - 0.0000001, data.latitude, data.longitude, data.latitude + 0.0000001];
     var stream = twitter.stream('statuses/filter', { locations: client_location});
-    //var stream = twitter.stream('statuses/filter', { track: 'mango'});
 
     // Push to strams array for multiple streams.
     streams.push(stream);
