@@ -10,9 +10,13 @@ var options = {
 	mouseDragging: 1,
 	releaseSwing: 1,
 	elasticBounds: 1,
+	scrollBar: $('.scrollbar'),
+	dragHandle: 1,
 	speed: 300,
 };
 var $frame = new Sly('.frame', options).init();
+
+var elements = [];
 
 // Listen for tweets from the server.
 socket.on('tweets', function(tweet) {
@@ -24,6 +28,28 @@ socket.on('tweets', function(tweet) {
 
 	// Replace temporary element with an embedded tweet.
 	twttr.widgets.createTweet(tweetID, $("#" + tweetID)[0], {});
+
+	// Slide new tweet in from the left.
+	var element = $('#' + tweetID);
+	element
+		.css({ opacity: '0', left: -element.width() })
+		.animate({ opacity: '1', left: 0 }, 500, 'easeInOutCubic');
+
+	// Slide existing tweets to the right.
+	for (var i = 0; i < elements.length; i++) {
+		elements[i]
+			.css({ left: -elements[i].width() })
+			.animate({ left: 0 }, 500, 'easeInOutCubic');
+	}
+
+	elements.unshift(element);
+
+	// Only keep 20 items around to avoid lag.
+	var maxElements = 20;
+	if (elements.length > maxElements) {
+		$frame.remove(maxElements - 1);
+		elements.pop();
+	}
 });
 
 // Callback for successful geolocation.
@@ -69,6 +95,32 @@ if (navigator.geolocation) {
 
 //Sending filter keyword to server for use
 function sendFilter(form) {
-	var filter = form.inputbox.value;
-	socket.emit('filter', filter);
+	if (form.inputbox.value != ""){
+		var filter = form.inputbox.value;
+		socket.emit('filter', filter);
+	}
+	else{
+		alert("Error: Please set a Filter Value");
+	}
+}
+
+//Sending Start button signal
+function sendStart(form) {
+	var streamType = null;
+	//Start a Location Based Stream
+	if(form.streamtypebox.checked == false){
+		streamType = "Location Based";
+		socket.emit('start', streamType);
+	}
+	//Start a Keyword Based Stream
+	else{
+		if(form.inputbox.value != ""){
+			streamType = "Keyword Based";
+			socket.emit('start', streamType);
+			
+		}
+		else{
+			alert("Error: Please set a Filter Value");
+		}
+	}	
 }
