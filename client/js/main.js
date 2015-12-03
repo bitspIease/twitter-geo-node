@@ -11,7 +11,7 @@ var options = {
 	releaseSwing: 1,
 	elasticBounds: 1,
 	scrollBar: $('.scrollbar'),
-    dragHandle: 1,
+	dragHandle: 1,
 	speed: 300,
 };
 var $frame = new Sly('.frame', options).init();
