@@ -64,20 +64,22 @@ io.on('connection', function(client) {
 
     console.log("* client " + client.id + " was sent tweet: " + tweet.id);
 
-    // If a keyword filter has not been set just do location
-    if(keyword === null ){
-      console.log("Keyword not defined");
-      client.emit('tweets', tweet);
-    }
-    // If it has been set filter location by keyword
-    else{
-      var match = tweet.text.search(' ' + keyword + ' ');
-
-      // Send the tweet to the client.
-      if(match != -1 || streamType == "Keyword Based"){
+  if(tweet.place.country_code != "MX"){
+      // If a keyword filter has not been set just do location
+      if(keyword === null ){
+        console.log("Keyword not defined");
         client.emit('tweets', tweet);
       }
+      else{
+        var match = tweet.text.search(' ' + keyword + ' ');
+  
+        // Send the tweet to the client.
+        if(match != -1 || streamType == "Keyword Based"){
+          client.emit('tweets', tweet);
+        }
+      }
     }
+    else console.log("MEXICAN TWEET ALERT!!!");
   };
 
   //Listen for start stream button
@@ -119,6 +121,7 @@ io.on('connection', function(client) {
   // Listen for location notifications sent from the client.
   client.on('location', function(data) {
     console.log("* client " + client.id + " sent location: " + JSON.stringify(data));
+    // Set up a new stream to feed to the client.
 
     // Set up stream based upon client location
     client_location = [data.longitude - 1, data.latitude, data.longitude, data.latitude + 1];
