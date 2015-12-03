@@ -69,6 +69,32 @@ if (navigator.geolocation) {
 
 //Sending filter keyword to server for use
 function sendFilter(form) {
-	var filter = form.inputbox.value;
-	socket.emit('filter', filter);
+	if (form.inputbox.value != ""){
+		var filter = form.inputbox.value;
+		socket.emit('filter', filter);
+	}
+	else{
+		alert("Error: Please set a Filter Value");
+	}
+}
+
+//Sending Start button signal
+function sendStart(form) {
+	var streamType = null;
+	//Start a Location Based Stream
+	if(form.streamtypebox.checked == false){
+		streamType = "Location Based";
+		socket.emit('start', streamType);
+	}
+	//Start a Keyword Based Stream
+	else{
+		if(form.inputbox.value != ""){
+			streamType = "Keyword Based";
+			socket.emit('start', streamType);
+			
+		}
+		else{
+			alert("Error: Please set a Filter Value");
+		}
+	}	
 }

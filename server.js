@@ -37,6 +37,8 @@ io.on('connection', function(client) {
   console.log("* client " + client.id + " connected");
 
   var streams = [];
+  var streamType = null;
+  var client_location = null;
   var keyword = null;
   var twitter = createTwitClient();
 
@@ -53,38 +55,68 @@ io.on('connection', function(client) {
   // Aggregate function for location and keyword streams.
   var handleTweet = function(tweet) {
     console.log("* client " + client.id + " was sent tweet: " + tweet.id);
+    console.log(tweet.retweeted);
+    console.log(tweet.retweet_count);
 
     // If a keyword filter has not been set just do location
     if(keyword === null ){
       console.log("Keyword not defined");
-       client.emit('tweets', tweet);
+      client.emit('tweets', tweet);
     }
     // If it has been set filter location by keyword
     else{
       var match = tweet.text.search(' ' + keyword + ' ');
 
       // Send the tweet to the client.
-      if(match != -1){
+      if(match != -1 || streamType == "KeywordBased"){
         client.emit('tweets', tweet);
       }
     }
   };
+  
+  //Listen for start stream button
+  client.on('start', function(data){
+    //Set up stream
+    streamType = data;
+    
+    //Checking what type of stream to set up
+    //Location Stream
+    if(streamType == "Location Based"){
+      console.log("Starting Location Stream");
+      var stream = twitter.stream('statuses/filter', { locations: client_location});
+
+      // Push to streams array for multiple streams.
+      streams.push(stream);
+
+      // What to do with tweets
+      stream.on('tweet', function (tweet) {
+        handleTweet(tweet);
+      });
+    }
+    //Keyword Stream
+    else{
+        console.log("Starting Keyword Stream");
+        
+        var stream = twitter.stream('statuses/filter', { track: keyword});
+  
+        // Push to streams array for multiple streams.
+        streams.push(stream);
+  
+        // What to do with tweets
+        stream.on('tweet', function (tweet) {
+          handleTweet(tweet);
+        });
+    }
+    
+  });
 
   // Listen for location notifications sent from the client.
   client.on('location', function(data) {
     console.log("* client " + client.id + " sent location: " + JSON.stringify(data));
 
     // Set up stream based upon client location
-    var client_location = [data.longitude - 1, data.latitude, data.longitude, data.latitude + 1];
-    var stream = twitter.stream('statuses/filter', { locations: client_location});
-
-    // Push to strams array for multiple streams.
-    streams.push(stream);
-
-    // What to do with tweets
-    stream.on('tweet', function (tweet) {
-      handleTweet(tweet);
-    });
+    client_location = [data.longitude - 1, data.latitude, data.longitude, data.latitude + 1];
+    
   });
 
   // Listen for filter keyword
