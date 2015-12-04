@@ -52,18 +52,17 @@ html, body {
 .scrollbar {
 	height: 10px;
 	background: #ccc;
-
 	position: fixed;
-    bottom: 10px;
-    width: 100%;
+	bottom: 10px;
+	width: 100%;
 
     transition: opacity .25s ease-in-out;
-    opacity: 0.2;
+	opacity: 0.2;
 }
 
 .scrollbar:hover {
 	transition: opacity .25s ease-in-out;
-    opacity: 1;
+	opacity: 1;
 }
 
 .scrollbar .handle {
