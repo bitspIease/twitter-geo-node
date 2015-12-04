@@ -49,10 +49,16 @@ io.on('connection', function(client) {
     console.log("* client " + client.id + " disconnected");
 
     // Stop all streams.
+    disconnectAllStreams();
+  });
+
+  var disconnectAllStreams = function() {
     streams.forEach(function (stream) {
       stream.stop();
     });
-  });
+
+    streams = [];
+  }
 
   client.on('toggle-pause', function() {
     console.log("* toggling pause...");
@@ -64,7 +70,7 @@ io.on('connection', function(client) {
     // Ignore retweets.
     if (tweet.hasOwnProperty('retweeted_status')) {
       if (tweet.retweeted_status.retweet_count > 0) {
-        console.log("* client " + client.id + " ignoring retweet");
+        //console.log("* client " + client.id + " ignoring retweet");
         return;
       }
     }
@@ -80,7 +86,7 @@ io.on('connection', function(client) {
         var regexExpression = "(\\b" + keyword + ")\\w*\\b";
         var regex = new RegExp(regexExpression, 'g');
         var matches = tweetString.match(regex);
-        console.log("* found matches: " +  matches);
+        // console.log("* found matches: " +  matches);
 
         // Send the tweet to the client.
         if (matches != null || streamType == "Keyword Based"){
@@ -102,7 +108,7 @@ io.on('connection', function(client) {
     var currentTime = new Date();
     var timeElapsed = ((currentTime - lastTweetTime) / 1000);
     if (timeElapsed < 1) {
-      console.log("* skipping tweet, only " + timeElapsed + "s elapsed");
+      // console.log("* skipping tweet, only " + timeElapsed + "s elapsed");
       return;
     } else {
       console.log("* " + timeElapsed + "s elapsed, sending tweet");
@@ -115,8 +121,11 @@ io.on('connection', function(client) {
 
   //Listen for start stream button
   client.on('start', function(data){
-    //Set up stream
-    streamType = data;
+    // Clear any previous streams.
+    disconnectAllStreams();
+
+    keyword = data.keyword;
+    streamType = data.type;
 
     //Checking what type of stream to set up
     //Location Stream
@@ -134,7 +143,7 @@ io.on('connection', function(client) {
     }
     //Keyword Stream
     else{
-        console.log("Starting Keyword Stream");
+        console.log("Starting Keyword Stream with keyword: " + keyword);
 
         var stream = twitter.stream('statuses/filter', { track: keyword});
 
@@ -146,7 +155,6 @@ io.on('connection', function(client) {
           handleTweet(tweet);
         });
     }
-
   });
 
   // Listen for location notifications sent from the client.
@@ -156,14 +164,6 @@ io.on('connection', function(client) {
 
     // Set up stream based upon client location
     client_location = [data.longitude - 1, data.latitude, data.longitude, data.latitude + 1];
-
   });
-
-  // Listen for filter keyword
-  client.on('filter', function(data) {
-    console.log("* client " + client.id + " sent filter: " + data);
-    keyword = data;
-  });
-
 // End IO connection
 });
