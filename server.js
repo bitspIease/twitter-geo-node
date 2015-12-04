@@ -41,6 +41,7 @@ io.on('connection', function(client) {
   var client_location = null;
   var keyword = null;
   var twitter = createTwitClient();
+  var lastTweetTime = new Date();
 
   // Listen for disconnects.
   client.on('disconnect', function() {
@@ -62,6 +63,16 @@ io.on('connection', function(client) {
       }
     }
 
+    // Only send 1 tweet per second.
+    var currentTime = new Date();
+    if (((currentTime - lastTweetTime) / 1000) < 1) {
+      console.log("skipping tweet, only " + ((currentTime - lastTweetTime) / 1000) + " elapsed");
+      return;
+    } else {
+      console.log("continuing");
+      lastTweetTime = currentTime;
+    }
+
     console.log("* client " + client.id + " was sent tweet: " + tweet.id);
   if(tweet.place === null || tweet.place.country_code != "MX"){
       // If a keyword filter has not been set just do location
@@ -71,7 +82,7 @@ io.on('connection', function(client) {
       }
       else{
         var match = tweet.text.search(' ' + keyword + ' ');
-  
+
         // Send the tweet to the client.
         if(match != -1 || streamType == "Keyword Based"){
           client.emit('tweets', tweet);
