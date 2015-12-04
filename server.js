@@ -41,6 +41,8 @@ io.on('connection', function(client) {
   var client_location = null;
   var keyword = null;
   var twitter = createTwitClient();
+  var lastTweetTime = new Date();
+  var paused = false;
 
   // Listen for disconnects.
   client.on('disconnect', function() {
@@ -50,6 +52,11 @@ io.on('connection', function(client) {
     streams.forEach(function (stream) {
       stream.stop();
     });
+  });
+
+  client.on('toggle-pause', function() {
+    console.log("* toggling pause...");
+    paused = !paused;
   });
 
   // Aggregate function for location and keyword streams.
@@ -62,24 +69,49 @@ io.on('connection', function(client) {
       }
     }
 
-    console.log("* client " + client.id + " was sent tweet: " + tweet.id);
-  if(tweet.place === null || tweet.place.country_code != "MX"){
+    if(tweet.place === null || tweet.place.country_code != "MX"){
       // If a keyword filter has not been set just do location
       if(keyword === null ){
-        console.log("Keyword not defined");
-        client.emit('tweets', tweet);
+        console.log("* keyword not defined, falling back to location");
+        sendTweet(client, tweet)
       }
       else{
-        var match = tweet.text.search(' ' + keyword + ' ');
-  
+        var tweetString = tweet.text.toLowerCase();
+        var regexExpression = "(\\b" + keyword + ")\\w*\\b";
+        var regex = new RegExp(regexExpression, 'g');
+        var matches = tweetString.match(regex);
+        console.log("* found matches: " +  matches);
+
         // Send the tweet to the client.
-        if(match != -1 || streamType == "Keyword Based"){
-          client.emit('tweets', tweet);
+        if (matches != null || streamType == "Keyword Based"){
+          sendTweet(client, tweet)
         }
       }
     }
     else console.log("MEXICAN TWEET ALERT!!!");
   };
+
+  var sendTweet = function(client, tweet) {
+    // Skip tweets while we're paused.
+    if (paused) {
+      console.log("* currently paused, skipping tweet");
+      return;
+    }
+
+    // Only send 1 tweet per second.
+    var currentTime = new Date();
+    var timeElapsed = ((currentTime - lastTweetTime) / 1000);
+    if (timeElapsed < 1) {
+      console.log("* skipping tweet, only " + timeElapsed + "s elapsed");
+      return;
+    } else {
+      console.log("* " + timeElapsed + "s elapsed, sending tweet");
+      lastTweetTime = currentTime;
+    }
+
+    console.log("* client " + client.id + " was sent tweet: " + tweet.id);
+    client.emit('tweets', tweet);
+  }
 
   //Listen for start stream button
   client.on('start', function(data){

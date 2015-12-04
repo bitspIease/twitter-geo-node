@@ -125,3 +125,7 @@ function sendStart(form) {
 		}
 	}
 }
+
+function sendTogglePause(form) {
+	socket.emit('toggle-pause');
+}
