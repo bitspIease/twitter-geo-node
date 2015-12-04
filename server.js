@@ -76,10 +76,14 @@ io.on('connection', function(client) {
         sendTweet(client, tweet)
       }
       else{
-        var match = tweet.text.search(' ' + keyword + ' ');
+        var tweetString = tweet.text.toLowerCase();
+        var regexExpression = "(\\b" + keyword + ")\\w*\\b";
+        var regex = new RegExp(regexExpression, 'g');
+        var matches = tweetString.match(regex);
+        console.log("* found matches: " +  matches);
 
         // Send the tweet to the client.
-        if(match != -1 || streamType == "Keyword Based"){
+        if (matches != null || streamType == "Keyword Based"){
           sendTweet(client, tweet)
         }
       }
