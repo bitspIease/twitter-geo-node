@@ -48,7 +48,7 @@ socket.on('tweets', function(tweet) {
 	// Only keep 20 items around to avoid lag.
 	var maxElements = 20;
 	if (elements.length > maxElements) {
-		$frame.remove(maxElements - 1);
+		$frame.remove(maxElements);
 		elements.pop();
 	}
 });
