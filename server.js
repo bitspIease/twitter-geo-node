@@ -1,5 +1,7 @@
 // server.js
 
+var text_test = "TEST";
+
 // Set up the Twitter library.
 var Twit = require('twit')
 function createTwitClient() {
@@ -70,8 +72,8 @@ io.on('connection', function(client) {
         client.emit('tweets', tweet);
       }
       else{
-        var match = tweet.text.search(' ' + keyword + ' ');
-  
+        //var match = tweet.text.search(' ' + keyword + ' ');
+        var match = parse_tweet(tweet, keyword);
         // Send the tweet to the client.
         if(match != -1 || streamType == "Keyword Based"){
           client.emit('tweets', tweet);
@@ -135,3 +137,34 @@ io.on('connection', function(client) {
 
 // End IO connection
 });
+
+function parse_tweet(tweet, keyword){
+  var parse_me = tweet.text.toLowerCase();
+  var block = new Array(keyword.length + 1).join('b');
+  var clear1, clear2;
+
+  for(var l = 0; l < keyword.length; l++){
+      block = replaceAt(l, 'a', block);
+    }
+
+  for(var i = 0; i < tweet.text.length - keyword.length; i++){
+    for(var k = 0; k < keyword.length; k++){
+      block = replaceAt(k, tweet.text[i+k], block);
+    }
+    if(block == keyword){
+      if(i > 1 && tweet.text[i-1] == " ")
+      {
+        if(i == tweet.text.length - keyword.length - 1 || tweet.text[i + keyword.length] == " "){
+          return 1;
+        }
+      }
+      else return 1;
+    }
+  }
+}
+
+function replaceAt(index, character, block){
+  var pls;
+  pls = block.substr(0, index) + character + block.substr(index+character.length)
+  return pls;
+}
