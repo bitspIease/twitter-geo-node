@@ -75,7 +75,7 @@ io.on('connection', function(client) {
         //var match = tweet.text.search(' ' + keyword + ' ');
         var match = parse_tweet(tweet, keyword);
         // Send the tweet to the client.
-        if(match != -1 || streamType == "Keyword Based"){
+        if(match == 1 || streamType == "Keyword Based"){
           client.emit('tweets', tweet);
         }
       }
@@ -138,33 +138,47 @@ io.on('connection', function(client) {
 // End IO connection
 });
 
-function parse_tweet(tweet, keyword){
+function parse_tweet(tweet, keyword_input){
+  var test_keyword = keyword_input.toLowerCase();
   var parse_me = tweet.text.toLowerCase();
-  var block = new Array(keyword.length + 1).join('b');
-  var clear1, clear2;
+  var block = new Array(test_keyword.length + 1).join('b');
+  var last;
 
-  for(var l = 0; l < keyword.length; l++){
-      block = replaceAt(l, 'a', block);
+  for(var i = 0; i < parse_me.length - test_keyword.length + 1; i++){
+    for(var k = 0; k < test_keyword.length; k++){
+      block = replaceAt(k, parse_me[i+k], block);
     }
-
-  for(var i = 0; i < tweet.text.length - keyword.length; i++){
-    for(var k = 0; k < keyword.length; k++){
-      block = replaceAt(k, tweet.text[i+k], block);
-    }
-    if(block == keyword){
-      if(i > 1 && tweet.text[i-1] == " ")
+    if(block == test_keyword){
+      console.log("word found");
+      if( i == 0){
+        console.log("word first");
+        return 1;
+      } 
+      else if(i > 1 && parse_me[i-1] == " ")
       {
-        if(i == tweet.text.length - keyword.length - 1 || tweet.text[i + keyword.length] == " "){
+        console.log("word found after first");
+        if( last = isLast(block, parse_me) || parse_me[i + test_keyword.length] == " " || parse_me[i + test_keyword.length] == "." || parse_me[i + test_keyword.length] == "?" || parse_me[i + test_keyword.length] == "!"){
+          console.log("word is last or has space after");
           return 1;
         }
       }
-      else return 1;
     }
   }
+  return 2;
 }
 
 function replaceAt(index, character, block){
   var pls;
   pls = block.substr(0, index) + character + block.substr(index+character.length)
   return pls;
+}
+
+function isLast(block, parse_me){
+  for(var q = parse_me.length -1; q > parse_me.length - block.length; q--){
+   for(var z = block.length -1; z > 0 ;z--)
+    if(parse_me[q] != block[z]){
+      return false;
+    }
+    else return true;
+  }
 }
