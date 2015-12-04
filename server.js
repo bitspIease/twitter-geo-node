@@ -71,9 +71,11 @@ io.on('connection', function(client) {
       }
       else{
         var match = tweet.text.search(' ' + keyword + ' ');
+        var match2 = tweet.text.search(keyword + ' ');
+        var match3 = tweet.text.search(' ' + keyword);
   
         // Send the tweet to the client.
-        if(match != -1 || streamType == "Keyword Based"){
+        if(match != -1 || match2 != -1 || match3 != -1 || streamType == "Keyword Based"){
           client.emit('tweets', tweet);
         }
       }
