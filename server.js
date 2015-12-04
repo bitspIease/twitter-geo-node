@@ -63,8 +63,7 @@ io.on('connection', function(client) {
     }
 
     console.log("* client " + client.id + " was sent tweet: " + tweet.id);
-
-  if(tweet.place.country_code != "MX"){
+  if(tweet.place === null || tweet.place.country_code != "MX"){
       // If a keyword filter has not been set just do location
       if(keyword === null ){
         console.log("Keyword not defined");
