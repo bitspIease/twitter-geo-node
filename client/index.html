@@ -2,21 +2,26 @@
 <html lang="en" ng-app>
   <head>
     <title>Twitter Geo</title>
-    <link rel="stylesheet" href="/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/css/bootstrap-responsive.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css">
     <link rel="stylesheet" href="/css/main.css">
   </head>
   <body>
-    <form action = "main.js" method="get">
-      Filter Keyword: <br>
-      <input type="text" name="inputbox" value="">
-      <input type="checkbox" name="streamtypebox" value="CheckBox1"> Filter by Keyword Only 
-      <br>
-      <input type="button" name="button" value="Set Filter" onClick="sendFilter(this.form)">
-      <input type="button" name="startButton" value="Start Stream" onClick="sendStart(this.form)">
-    </form>
+    <nav class="navbar navbar-default">
+      <div class="container-fluid">
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+          <form class="navbar-form navbar-left" role="search" action = "main.js" method="get">
+            <div class="form-group">
+              <input type="text" class="form-control" placeholder="Keyword" name="inputbox">
+            </div>
+            <input type="checkbox" name="streamtypebox"> Filter by Keyword Only
+            <input type="button" class="btn btn-default" name="button" value="Set Filter" onClick="sendFilter(this.form)">
+            <input type="button" class="btn btn-default" name="startButton" value="Start Stream" onClick="sendStart(this.form)">
+          </form>
+        </div>
+      </div>
+    </nav>
 
-    <div id="tweet-container"></div>
     <div class="frame">
       <ul class="slidee">
       </ul>

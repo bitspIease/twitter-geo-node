@@ -12,6 +12,7 @@ var options = {
 	elasticBounds: 1,
 	scrollBar: $('.scrollbar'),
 	dragHandle: 1,
+	clickBar: 1,
 	speed: 300,
 };
 var $frame = new Sly('.frame', options).init();
@@ -117,10 +118,10 @@ function sendStart(form) {
 		if(form.inputbox.value != ""){
 			streamType = "Keyword Based";
 			socket.emit('start', streamType);
-			
+
 		}
 		else{
 			alert("Error: Please set a Filter Value");
 		}
-	}	
+	}
 }

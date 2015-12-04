@@ -3,6 +3,20 @@ html, body {
 	margin: 0;
 }
 
+.navbar {
+	transition: opacity .25s ease-in-out;
+	position: absolute;
+	width: 100%;
+	background-color: #f2f2f2;
+	z-index: 2147483647;
+	opacity: 0.3;
+}
+
+.navbar:hover {
+	transition: opacity .25s ease-in-out;
+	opacity: 1;
+}
+
 /* Scrolling container. */
 .frame {
 	height: 100%;
@@ -36,17 +50,29 @@ html, body {
 
 /* Scrolling. */
 .scrollbar {
-	margin: 0 0 1em 0;
-	height: 4px;
+	height: 10px;
 	background: #ccc;
-	line-height: 0;
+
+	position: fixed;
+    bottom: 10px;
+    width: 100%;
+
+    transition: opacity .25s ease-in-out;
+    opacity: 0.2;
 }
+
+.scrollbar:hover {
+	transition: opacity .25s ease-in-out;
+    opacity: 1;
+}
+
 .scrollbar .handle {
 	width: 100px;
 	height: 100%;
 	background: #292a33;
 	cursor: pointer;
 }
+
 .scrollbar .handle .mousearea {
 	position: absolute;
 	left: 0;
