@@ -75,6 +75,14 @@ io.on('connection', function(client) {
       }
     }
 
+    // Ignore potentially sensitive tweets.
+    if (tweet.hasOwnProperty('possibly_sensitive')) {
+      if (tweet.possibly_sensitive) {
+        console.log("* client " + client.id + " ignoring sensitive content");
+        return;
+      }
+    }
+
     if(tweet.place === null || tweet.place.country_code != "MX"){
       // If a keyword filter has not been set just do location
       if(keyword === null ){
@@ -94,7 +102,6 @@ io.on('connection', function(client) {
         }
       }
     }
-    else console.log("MEXICAN TWEET ALERT!!!");
   };
 
   var sendTweet = function(client, tweet) {
