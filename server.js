@@ -42,6 +42,7 @@ io.on('connection', function(client) {
   var keyword = null;
   var twitter = createTwitClient();
   var lastTweetTime = new Date();
+  var paused = false;
 
   // Listen for disconnects.
   client.on('disconnect', function() {
@@ -65,11 +66,12 @@ io.on('connection', function(client) {
 
     // Only send 1 tweet per second.
     var currentTime = new Date();
-    if (((currentTime - lastTweetTime) / 1000) < 1) {
-      console.log("skipping tweet, only " + ((currentTime - lastTweetTime) / 1000) + " elapsed");
+    var timeElapsed = ((currentTime - lastTweetTime) / 1000);
+    if (timeElapsed < 1) {
+      console.log("* skipping tweet, only " + timeElapsed + "s elapsed");
       return;
     } else {
-      console.log("continuing");
+      console.log("* " + timeElapsed + "s elapsed, sending tweet");
       lastTweetTime = currentTime;
     }
 
