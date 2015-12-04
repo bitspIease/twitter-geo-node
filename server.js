@@ -54,6 +54,11 @@ io.on('connection', function(client) {
     });
   });
 
+  client.on('toggle-pause', function() {
+    console.log("* toggling pause...");
+    paused = !paused;
+  });
+
   // Aggregate function for location and keyword streams.
   var handleTweet = function(tweet) {
     // Ignore retweets.
@@ -62,6 +67,31 @@ io.on('connection', function(client) {
         console.log("* client " + client.id + " ignoring retweet");
         return;
       }
+    }
+
+    if(tweet.place === null || tweet.place.country_code != "MX"){
+      // If a keyword filter has not been set just do location
+      if(keyword === null ){
+        console.log("* keyword not defined, falling back to location");
+        sendTweet(client, tweet)
+      }
+      else{
+        var match = tweet.text.search(' ' + keyword + ' ');
+
+        // Send the tweet to the client.
+        if(match != -1 || streamType == "Keyword Based"){
+          sendTweet(client, tweet)
+        }
+      }
+    }
+    else console.log("MEXICAN TWEET ALERT!!!");
+  };
+
+  var sendTweet = function(client, tweet) {
+    // Skip tweets while we're paused.
+    if (paused) {
+      console.log("* currently paused, skipping tweet");
+      return;
     }
 
     // Only send 1 tweet per second.
@@ -76,23 +106,8 @@ io.on('connection', function(client) {
     }
 
     console.log("* client " + client.id + " was sent tweet: " + tweet.id);
-  if(tweet.place === null || tweet.place.country_code != "MX"){
-      // If a keyword filter has not been set just do location
-      if(keyword === null ){
-        console.log("Keyword not defined");
-        client.emit('tweets', tweet);
-      }
-      else{
-        var match = tweet.text.search(' ' + keyword + ' ');
-
-        // Send the tweet to the client.
-        if(match != -1 || streamType == "Keyword Based"){
-          client.emit('tweets', tweet);
-        }
-      }
-    }
-    else console.log("MEXICAN TWEET ALERT!!!");
-  };
+    client.emit('tweets', tweet);
+  }
 
   //Listen for start stream button
   client.on('start', function(data){
