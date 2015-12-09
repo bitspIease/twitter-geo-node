@@ -41,15 +41,28 @@ io.on('connection', function(client) {
   var client_location = null;
   var keyword = null;
   var twitter = createTwitClient();
+  var lastTweetTime = new Date();
+  var paused = false;
 
   // Listen for disconnects.
   client.on('disconnect', function() {
     console.log("* client " + client.id + " disconnected");
 
     // Stop all streams.
+    disconnectAllStreams();
+  });
+
+  var disconnectAllStreams = function() {
     streams.forEach(function (stream) {
       stream.stop();
     });
+
+    streams = [];
+  }
+
+  client.on('toggle-pause', function() {
+    console.log("* toggling pause...");
+    paused = !paused;
   });
 
   // Aggregate function for location and keyword streams.
@@ -57,35 +70,68 @@ io.on('connection', function(client) {
     // Ignore retweets.
     if (tweet.hasOwnProperty('retweeted_status')) {
       if (tweet.retweeted_status.retweet_count > 0) {
-        console.log("* client " + client.id + " ignoring retweet");
+        //console.log("* client " + client.id + " ignoring retweet");
         return;
       }
     }
 
-    console.log("* client " + client.id + " was sent tweet: " + tweet.id);
-  if(tweet.place === null || tweet.place.country_code != "MX"){
+    if(tweet.place === null || tweet.place.country_code != "MX"){
       // If a keyword filter has not been set just do location
       if(keyword === null ){
-        console.log("Keyword not defined");
-        client.emit('tweets', tweet);
+        console.log("* keyword not defined, falling back to location");
+        sendTweet(client, tweet)
       }
       else{
+<<<<<<< HEAD
          var anyCharacter = new RegExp('.*');
          var match = tweet.text.search( anyCharacter + keyword + anyCharacter);
   
+=======
+        var tweetString = tweet.text.toLowerCase();
+        var regexExpression = "(\\b" + keyword + ")\\w*\\b";
+        var regex = new RegExp(regexExpression, 'g');
+        var matches = tweetString.match(regex);
+        // console.log("* found matches: " +  matches);
+
+>>>>>>> master
         // Send the tweet to the client.
-        if(match != -1 || streamType == "Keyword Based"){
-          client.emit('tweets', tweet);
+        if (matches != null || streamType == "Keyword Based"){
+          sendTweet(client, tweet)
         }
       }
     }
     else console.log("MEXICAN TWEET ALERT!!!");
   };
 
+  var sendTweet = function(client, tweet) {
+    // Skip tweets while we're paused.
+    if (paused) {
+      console.log("* currently paused, skipping tweet");
+      return;
+    }
+
+    // Only send 1 tweet per second.
+    var currentTime = new Date();
+    var timeElapsed = ((currentTime - lastTweetTime) / 1000);
+    if (timeElapsed < 1) {
+      // console.log("* skipping tweet, only " + timeElapsed + "s elapsed");
+      return;
+    } else {
+      console.log("* " + timeElapsed + "s elapsed, sending tweet");
+      lastTweetTime = currentTime;
+    }
+
+    console.log("* client " + client.id + " was sent tweet: " + tweet.id);
+    client.emit('tweets', tweet);
+  }
+
   //Listen for start stream button
   client.on('start', function(data){
-    //Set up stream
-    streamType = data;
+    // Clear any previous streams.
+    disconnectAllStreams();
+
+    keyword = data.keyword;
+    streamType = data.type;
 
     //Checking what type of stream to set up
     //Location Stream
@@ -103,7 +149,7 @@ io.on('connection', function(client) {
     }
     //Keyword Stream
     else{
-        console.log("Starting Keyword Stream");
+        console.log("Starting Keyword Stream with keyword: " + keyword);
 
         var stream = twitter.stream('statuses/filter', { track: keyword});
 
@@ -115,7 +161,6 @@ io.on('connection', function(client) {
           handleTweet(tweet);
         });
     }
-
   });
 
   // Listen for location notifications sent from the client.
@@ -125,14 +170,6 @@ io.on('connection', function(client) {
 
     // Set up stream based upon client location
     client_location = [data.longitude - 1, data.latitude, data.longitude, data.latitude + 1];
-
   });
-
-  // Listen for filter keyword
-  client.on('filter', function(data) {
-    console.log("* client " + client.id + " sent filter: " + data);
-    keyword = data;
-  });
-
 // End IO connection
 });

@@ -29,8 +29,10 @@
               <input type="text" class="form-control" placeholder="Keyword" name="inputbox">
             </div>
             <input type="checkbox" name="streamtypebox"> Filter by Keyword Only
-            <input type="button" class="btn btn-default" name="button" value="Set Filter" onClick="sendFilter(this.form)">
             <input type="button" class="btn btn-default" name="startButton" value="Start Stream" onClick="sendStart(this.form)">
+            <button type="button" class="btn btn-default" onClick="sendTogglePause(this.form)">
+              <span class="glyphicon glyphicon-pause"></span>
+            </button>
           </form>
         </div>
       </div>
