@@ -28,7 +28,7 @@ var http = require('http').Server(app);
 var io = require('socket.io')(http);
 
 // Listen for connections on the default port.
-http.listen(process.env.PORT, function() {
+http.listen(8041, function() {
   console.log('listening on *:' + process.env.PORT);
 });
 
